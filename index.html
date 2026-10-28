@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#14202e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Scout Desk">
+<title>Scout Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--panel:#ffffff;--ink:#14202e;--soft:#5a6677;--line:#dde2e9;--kron:#6d3fd6;--kron-bg:#efe9fd;
+--long:#0e8a6a;--long-bg:#e3f4ee;--short:#c2412d;--short-bg:#fbe9e5;--amber:#b7791f;--amber-bg:#fbf1df;--idle:#8a94a3;}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1722;--panel:#18222f;--ink:#e8edf3;--soft:#9aa6b6;--line:#273344;
+--kron:#a98bff;--kron-bg:#251d3d;--long:#3cc79c;--long-bg:#12302a;--short:#ff7a64;--short-bg:#3a1d19;--amber:#e7b04a;--amber-bg:#352a14;--idle:#6b7686;}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Archivo,system-ui,sans-serif;font-variation-settings:"wdth" 100;
+font-variant-numeric:tabular-nums;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header{padding:calc(14px + env(safe-area-inset-top)) 16px 6px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:26px;font-weight:800;font-variation-settings:"wdth" 72;letter-spacing:-.2px}
+.fresh{font-size:13px;color:var(--soft);text-align:right}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--long);vertical-align:1px}
+.dot.stale{background:var(--amber)}
+main{max-width:720px;margin:0 auto;padding:0 16px}
+section{display:none}section.on{display:block}
+h2{font-size:15px;font-weight:700;color:var(--soft);margin:22px 0 8px;font-variation-settings:"wdth" 90}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0 4px}
+.tile{border-radius:12px;padding:9px 2px 8px;text-align:center;background:var(--panel);border:1.5px solid var(--line);cursor:pointer;min-width:0}
+.tile b{display:block;font-size:12px;font-variation-settings:"wdth" 70;letter-spacing:.2px}
+.tile .ar{font-size:24px;line-height:1;margin:4px 0 3px;font-weight:800}
+.tile small{display:block;font-size:10.5px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.up .ar{color:var(--long)}.tile.down .ar{color:var(--short)}.tile.none .ar{color:var(--idle)}
+.tile.live{border-color:var(--kron);background:var(--kron-bg)}
+.tile.blocked{opacity:.55}
+.legend{font-size:12px;color:var(--soft);margin:2px 2px 0}
+.strip.watch{grid-template-columns:repeat(4,1fr);margin-top:10px}.strip.watch .tile{background:transparent;border-style:dashed}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:8px 0}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.big{font-size:34px;font-weight:800;font-variation-settings:"wdth" 80;line-height:1.05}
+.mid{font-size:20px;font-weight:700}
+.soft{color:var(--soft);font-size:13.5px}
+.pos{color:var(--long)}.neg{color:var(--short)}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px}
+.pill.buy,.pill.long,.pill.up{background:var(--long-bg);color:var(--long)}
+.pill.sell,.pill.short,.pill.down{background:var(--short-bg);color:var(--short)}
+.pill.k{background:var(--kron-bg);color:var(--kron)}
+.pill.wait{background:var(--amber-bg);color:var(--amber)}
+.pill.no{background:var(--bg);color:var(--soft)}
+.bar{position:relative;height:30px;margin:12px 2px 2px}
+.bar .track{position:absolute;top:13px;left:0;right:0;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--short) 0 var(--e),var(--long) var(--e) 100%)}
+.bar .mark{position:absolute;top:8px;width:2px;height:14px;background:var(--ink)}
+.bar .now{position:absolute;top:7px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--panel);border:3px solid var(--ink)}
+.bar .lab{position:absolute;top:24px;font-size:11px;color:var(--soft);transform:translateX(-50%);white-space:nowrap}
+.trade h3,.sig h3{margin:0;font-size:18px;font-variation-settings:"wdth" 85}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;font-size:13px}
+.grid3 div span{display:block;color:var(--soft);font-size:11.5px}
+.sig summary{list-style:none;cursor:pointer}.sig summary::-webkit-details-marker{display:none}
+.sig[open] summary{margin-bottom:8px}
+.agent{display:grid;grid-template-columns:76px 1fr;gap:6px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.agent b{font-size:12.5px;color:var(--soft);font-weight:600}
+.agent.kr b{color:var(--kron)}
+ul.warn{margin:4px 0 0 16px;padding:0;font-size:13px;color:var(--amber)}
+.cal{display:grid;grid-template-columns:62px 42px 1fr;gap:4px 8px;font-size:14px;padding:7px 0;border-top:1px solid var(--line)}
+.cal:first-of-type{border-top:0}
+.hi{color:var(--short);font-weight:700}
+.news p{margin:6px 0;font-size:15px}
+.news p b{font-variation-settings:"wdth" 80}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{padding:6px 4px;border-top:1px solid var(--line);text-align:left}th{color:var(--soft);font-weight:600;font-size:12px;border-top:0}
+td.n,th.n{text-align:right}
+svg.line{width:100%;height:110px;display:block}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);
+padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:none;border:0;color:var(--soft);font:600 12.5px Archivo,sans-serif;padding:6px 0;border-radius:10px;cursor:pointer}
+nav button svg{display:block;margin:0 auto 2px;width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+nav button.on{color:var(--kron)}
+button:focus-visible,.tile:focus-visible,summary:focus-visible{outline:2px solid var(--kron);outline-offset:2px}
+.empty{color:var(--soft);font-size:14px;padding:6px 0}
+.check{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:9px 0;border-top:1px solid var(--line)}
+.check .tick{font-size:18px;font-weight:800;color:var(--idle);line-height:1.2}.check.ok .tick{color:var(--long)}.check.bad .tick{color:var(--short)}
+.check .need{font-size:12px}
+.refresh{background:var(--panel);border:1px solid var(--line);color:var(--ink);font:600 13px Archivo,sans-serif;border-radius:20px;padding:5px 12px;cursor:pointer}
+.note{font-size:12.5px;color:var(--soft);margin:16px 2px 8px}
+@media (prefers-reduced-motion:no-preference){.strip .tile{animation:rise .5s both}.strip .tile:nth-child(2){animation-delay:.04s}
+.strip .tile:nth-child(3){animation-delay:.08s}.strip .tile:nth-child(4){animation-delay:.12s}.strip .tile:nth-child(5){animation-delay:.16s}
+.strip .tile:nth-child(6){animation-delay:.2s}.strip .tile:nth-child(7){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+</style></head>
+<body>
+<header><h1>Scout Desk</h1><div class="fresh" id="fresh">loading…</div></header>
+<main>
+<div class="strip" id="strip"></div>
+<div class="legend" id="legend">Arrows are Kronos's call for each pair. Violet = a trade is open.</div>
+<div class="strip watch" id="watch"></div>
+<div class="legend">Kronos also watches these on paper - the desk doesn't trade them.</div>
+
+<section id="today" class="on"></section>
+<section id="signals"></section>
+<section id="trades"></section>
+<section id="news"></section>
+<section id="tests"></section>
+</main>
+
+<nav id="nav">
+<button data-tab="today" class="on"><svg viewBox="0 0 24 24"><path d="M3 12l9-8 9 8M5 10v10h14V10"/></svg>Today</button>
+<button data-tab="signals"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/></svg>Signals</button>
+<button data-tab="trades"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Trades</button>
+<button data-tab="news"><svg viewBox="0 0 24 24"><path d="M5 4h11v16H5zM16 8h3v12h-3M8 8h5M8 12h5M8 16h3"/></svg>News</button>
+<button data-tab="tests"><svg viewBox="0 0 24 24"><path d="M9 3v6l-5 9a2 2 0 002 3h12a2 2 0 002-3l-5-9V3M8 3h8"/></svg>Tests</button>
+</nav>
+
+<script>
+const PAIRS=["EURUSD","GBPUSD","USDJPY","AUDUSD","NZDUSD","USDCAD","USDCHF","XAUUSD"];
+const KNAME=p=>p==="XAUUSD"?"GOLD":p;
+const LABEL=p=>p==="XAUUSD"?"GOLD":p;
+let D=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dp=p=>/JPY/.test(p)?3:(/XAU|GOLD/.test(p)?2:5);
+const fx=(p,v)=>v==null||isNaN(v)?"–":Number(v).toFixed(dp(p));
+const money=v=>Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const usd=v=>(v<0?"−$":"$")+money(v);
+const sgn=v=>(v>0?"+":v<0?"−":"")+"$"+money(v);
+const pct=(v,d=2)=>v==null||isNaN(v)?"–":(v>0?"+":v<0?"−":"")+Math.abs(v*100).toFixed(d)+"%";
+const cls=v=>v>0?"pos":v<0?"neg":"";
+
+async function load(){
+  try{const gid=location.hash.slice(1);
+    if(gid){const r=await fetch("https://api.github.com/gists/"+gid,{cache:"no-store"});const g=await r.json();const f=g.files["data.json"];
+      D=f.truncated?await (await fetch(f.raw_url,{cache:"no-store"})).json():JSON.parse(f.content);}
+    else{const r=await fetch("data.json?"+Date.now(),{cache:"no-store"});D=await r.json();}
+    render();}
+  catch(e){$("#fresh").textContent="Couldn't load the latest data. Check your connection and tap Refresh.";}
+}
+function stale(){const t=new Date(D.updated.replace(" ","T"));const age=(Date.now()-t)/60000;const d=new Date();
+  const trading=d.getDay()>=1&&d.getDay()<=5&&d.getHours()>=8&&d.getHours()<22;return trading&&age>80;}
+function pairState(p){
+  const run=D.run||{},c=(run.charts||{})[p]||{},v=(run.verdicts||[]).find(x=>x.pair===p)||{};
+  const open=(D.mt5.open||[]).find(t=>t.pair===p&&t.book==="desk");
+  let dir=c.kronos?c.kronos.direction:null;
+  if(!dir&&D.kronos){const k=(D.kronos.open||[]).find(x=>x.market===KNAME(p));if(k)dir=k.signal>0?"long":k.signal<0?"short":null;}
+  let state="no call";
+  if(open)state=open.side==="buy"?"in buy":"in sell";else if(v.verdict==="GO")state="ready";else if(v.verdict==="WAIT")state="waiting";else if(v.verdict==="REJECT")state="blocked";
+  return {c,v,open,dir,state};
+}
+function render(){
+  $("#fresh").innerHTML=`<span class="dot ${stale()?"stale":""}"></span>Updated ${esc(D.updated.slice(11))}<br>${esc(D.updated.slice(0,10))} <button class="refresh" onclick="load()">Refresh</button>`;
+  $("#strip").innerHTML=PAIRS.map(p=>{const s=pairState(p);const d=s.dir==="long"?"up":s.dir==="short"?"down":"none";
+    return `<div class="tile ${d} ${s.open?"live":""} ${s.state==="blocked"?"blocked":""}" tabindex="0" role="button" onclick="go('signals','${p}')">
+    <b>${p==="XAUUSD"?"GOLD<br>XAU":p.slice(0,3)+"<br>"+p.slice(3)}</b><div class="ar">${d==="up"?"▲":d==="down"?"▼":"·"}</div><small>${s.state}</small></div>`}).join("");
+  const W=[["US500","US500"],["NAS100","NAS100"],["BTCUSDT","BTC"],["ETHUSDT","ETH"]];
+  $("#watch").innerHTML=W.map(([m,l])=>{const k=((D.kronos||{}).open||[]).find(x=>x.market===m);const d=k?(k.signal>0?"up":k.signal<0?"down":"none"):"none";
+    const open=false;
+    return `<div class="tile ${d}" tabindex="0" role="button" onclick="go('tests')"><b>${l}</b><div class="ar">${d==="up"?"▲":d==="down"?"▼":"·"}</div><small>${open?"in trade":k?"paper":"no call"}</small></div>`}).join("");
+  today();signals();trades();news();tests();
+}
+function tradeBar(t){
+  const long=t.side==="buy",lo=long?t.sl:t.tp,hi=long?t.tp:t.sl;
+  if(!t.sl||!t.tp||hi<=lo)return "";
+  const x=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));const e=x(t.entry);
+  return `<div class="bar" style="--e:${long?e:100-e}%"><div class="track" style="${long?"":"background:linear-gradient(90deg,var(--long) 0 "+e+"%,var(--short) "+e+"% 100%)"}"></div>
+  <div class="mark" style="left:${e}%"></div><div class="now" style="left:${x(t.price)}%"></div>
+  <div class="lab" style="left:2%;transform:none">${long?"stop":"target"} ${fx(t.pair,lo)}</div>
+  <div class="lab" style="left:auto;right:0;transform:none">${long?"target":"stop"} ${fx(t.pair,hi)}</div></div>`;
+}
+function tradeCard(t){
+  return `<div class="card trade"><div class="row"><h3>${esc(t.pair)} <span class="pill ${t.side}">${t.side}</span>${t.book==="gold"?' <span class="pill no">gold test</span>':""}</h3>
+  <span class="mid ${cls(t.profit)}">${sgn(t.profit)}</span></div>
+  ${tradeBar(t)}
+  <div class="grid3" style="margin-top:22px"><div><span>Entry</span>${fx(t.pair,t.entry)}</div><div><span>Now</span>${fx(t.pair,t.price)}</div><div><span>Size</span>${t.lots} lots</div></div>
+  <div class="soft" style="margin-top:6px">Opened ${esc(t.opened)}</div></div>`;
+}
+function today(){
+  const m=D.mt5,run=D.run||{},todayStr=D.updated.slice(0,10);
+  const closedToday=(m.closed||[]).filter(t=>t.closed.slice(0,10)===todayStr&&!t.broker_error);
+  const banked=closedToday.reduce((a,t)=>a+t.profit,0),floating=(m.open||[]).reduce((a,t)=>a+t.profit,0);
+  let h=`<h2>Demo account today</h2><div class="card"><div class="big ${cls(banked+floating)}">${sgn(banked+floating)}</div>
+  <div class="soft">${sgn(banked)} banked from ${closedToday.length} closed trade${closedToday.length===1?"":"s"}, ${sgn(floating)} on ${m.open.length} open</div>
+  ${m.balance!=null?`<div class="soft">Balance ${usd(m.balance)} · equity ${usd(m.equity)}</div>`:""}
+  ${m.error?`<div class="soft">MT5 wasn't reachable at the last update - trades shown may be out of date.</div>`:""}</div>`;
+  h+=`<h2>Open trades</h2>`+((m.open||[]).length?m.open.map(tradeCard).join(""):`<div class="card empty">No open trades.</div>`);
+  const ev=((run.calendar||{}).events||[]).filter(e=>e.impact==="High").slice(0,4);
+  h+=`<h2>Next big events</h2><div class="card">${ev.length?ev.map(e=>`<div class="cal"><span>${esc(e.sa_time)}</span><b>${esc(e.country)}</b><span>${esc(e.title)}</span></div>`).join(""):`<div class="empty">No high-impact events in the next 36 hours.</div>`}</div>`;
+  if(D.kronos){const k=D.kronos;h+=`<h2>Kronos paper account</h2><div class="card" onclick="go('tests')"><div class="row"><span class="mid">${usd(k.balance)}</span><span class="${cls(k.balance-k.start)}">${pct(k.balance/k.start-1)}</span></div>
+  <div class="soft">${k.scored} forecasts scored${k.hit!=null?`, right ${(k.hit*100).toFixed(1)}% (coin flip 50%)`:""}</div></div>`;}
+  $("#today").innerHTML=h;
+}
+function signals(){
+  const run=D.run||{};if(!run.charts){$("#signals").innerHTML=`<div class="card empty">No desk run yet today.</div>`;return;}
+  const head=`<h2>Desk call: ${esc(run.call||"")}${run.kronos_mode?' · <span style="color:var(--kron)">Kronos leads direction</span>':""}</h2>`;
+  const body=PAIRS.filter(p=>run.charts[p]).map(p=>{const s=pairState(p),c=s.c,v=s.v,k=c.kronos;
+    const t=(run.trades||[]).find(x=>x.pair===p);const plan=(t&&t.plan)||c.plan;
+    const vp=v.verdict==="GO"?"up":v.verdict==="WAIT"?"wait":"no";
+    const sc=(run.scout||[]).find(x=>x.pair===p)||{};const ne=(run.next_event||{})[p];
+    return `<details class="card sig" id="sig-${p}"><summary><div class="row"><h3>${p==="XAUUSD"?"GOLD · XAUUSD":p}</h3>
+    <span>${k?`<span class="pill k">Kronos ${k.direction}</span> `:""}<span class="pill ${vp}">${esc(v.verdict||"–")}</span></span></div>
+    <div class="soft">${esc(s.state)}${v.confidence?` · confidence ${esc(v.confidence)}`:""}</div></summary>
+    ${plan?`<div class="grid3"><div><span>Entry zone</span>${fx(p,plan.entry_low)}–${fx(p,plan.entry_high).slice(-3)}</div><div><span>Stop</span>${fx(p,plan.stop)}</div><div><span>Target</span>${fx(p,plan.target)}</div></div>
+    <div class="soft" style="margin:4px 0 8px">Stop ${plan.stop_pips} pips${t?` · ${t.lots} lots, risk $${t.risk_usd}`:""}</div>`:""}
+    <div class="agent kr"><b>Kronos</b><span>${k?`forecasts ${fx(p,k.forecast)} vs last close ${fx(p,k.last_close)} → ${k.direction}`:"no fresh forecast"}</span></div>
+    <div class="agent"><b>Chart</b><span>daily ${esc(c.daily_trend)}, 1H ${esc(c.h1_trend)}${c.chart_bias?` → ${esc(c.chart_bias)}`:""} · RSI ${c.rsi_h1}</span></div>
+    <div class="agent"><b>Scout</b><span>${sc.change_pct!=null?`${sc.change_pct>0?"+":""}${sc.change_pct}% today, ${sc.range_vs_atr}× normal range`:"–"}</span></div>
+    <div class="agent"><b>News</b><span>headlines lean ${esc((run.news_lean||{})[p]||"–")}</span></div>
+    <div class="agent"><b>Calendar</b><span>${ne?`${esc(ne.country)} ${esc(ne.title)} ${esc(ne.sa_time)}`:"no big event for this pair"}</span></div>
+    <div class="agent"><b>Sceptic</b><span>${esc(v.verdict)}${(v.reasons||[]).length?" - "+esc(v.reasons.join("; ")):v.wait?" - "+esc(v.wait):" - all checks passed"}
+    ${(v.warnings||[]).length?`<ul class="warn">${v.warnings.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>`:""}</span></div>
+    </details>`}).join("");
+  $("#signals").innerHTML=head+body+`<p class="note">From the desk run at ${esc((run.time||"").slice(11,16))}. Tap a pair to see how each agent thought.</p>`;
+}
+function trades(){
+  const m=D.mt5,c=(m.closed||[]);
+  const desk=c.filter(t=>t.book==="desk"&&!t.broker_error),wins=desk.filter(t=>t.profit>0).length,tot=desk.reduce((a,t)=>a+t.profit,0);
+  let h=`<h2>Open</h2>`+((m.open||[]).length?m.open.map(tradeCard).join(""):`<div class="card empty">No open trades.</div>`);
+  h+=`<h2>Closed in the last 90 days</h2><div class="card"><div class="row"><span class="mid ${cls(tot)}">${sgn(tot)}</span><span class="soft">${desk.length} desk trades, ${wins} won</span></div></div>`;
+  h+=c.length?`<div class="card"><table><tr><th>Trade</th><th>Entry → exit</th><th class="n">Result</th></tr>${c.map(t=>`<tr>
+  <td><b>${esc(t.pair)}</b> <span class="pill ${t.side}">${t.side}</span><br><span class="soft">${esc(t.closed.slice(5))} · ${t.broker_error?"<b>broker price error - not counted</b>":esc(t.how)}</span></td>
+  <td>${fx(t.pair,t.entry)}<br>${fx(t.pair,t.exit)}</td><td class="n ${t.broker_error?"":cls(t.profit)}"><b>${t.broker_error?"<s>"+sgn(t.profit)+"</s>":sgn(t.profit)}</b></td></tr>`).join("")}</table>${c.some(t=>t.broker_error)?`<div class="soft" style="margin-top:6px">Struck-out results came from impossible broker prices and are left out of every total.</div>`:""}</div>`:`<div class="card empty">No closed trades yet.</div>`;
+  $("#trades").innerHTML=h;
+}
+function news(){
+  const run=D.run||{},n=run.news||{};
+  let h=`<h2>What the desk read this hour</h2><div class="card news">`;
+  if(n.summary){h+=n.summary.split(/\n+/).filter(Boolean).map(l=>{const m=l.match(/^([A-Z]{3}):\s*(.*)$/);return m?`<p><b>${m[1]}</b> ${esc(m[2])}</p>`:`<p>${esc(l)}</p>`}).join("");}
+  else{h+=Object.entries(n.by_currency||{}).map(([c,v])=>`<p><b>${esc(c)}</b> ${esc(v.tone)}${v.headlines&&v.headlines[0]?" - "+esc(v.headlines[0]):""}</p>`).join("")||`<div class="empty">No headlines this run.</div>`;}
+  h+=`</div>${(n.sources||[]).length?`<p class="note">Sources: ${esc(n.sources.join(", "))}</p>`:""}`;
+  const ev=(run.calendar||{}).events||[];
+  h+=`<h2>Calendar, next 36 hours</h2><div class="card">${ev.length?ev.map(e=>`<div class="cal"><span>${esc(e.sa_time)}</span><b>${esc(e.country)}</b><span class="${e.impact==="High"?"hi":""}">${esc(e.title)}${e.forecast?` <span class="soft">f ${esc(e.forecast)} p ${esc(e.previous||"–")}</span>`:""}</span></div>`).join(""):`<div class="empty">Nothing scheduled.</div>`}</div>
+  <p class="note">The desk doesn't open trades within 1 hour of a red event or for 2 hours after, and closes trades before events on their currencies.</p>`;
+  $("#news").innerHTML=h;
+}
+function spark(pts,color){
+  if(!pts||pts.length<2)return `<div class="empty">The chart appears after the second scored day.</div>`;
+  const v=pts.map(p=>p[1]),lo=Math.min(...v),hi=Math.max(...v),sp=(hi-lo)||1;
+  const d=v.map((y,i)=>`${(i/(v.length-1)*300).toFixed(1)},${(100-(y-lo)/sp*90-5).toFixed(1)}`).join(" ");
+  return `<svg class="line" viewBox="0 0 300 100" preserveAspectRatio="none"><polyline fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke" points="${d}"/></svg>`;
+}
+function tests(){
+  let h="";const k=D.kronos;const R=D.ready;
+  if(R&&R.checks){h+=`<h2>Ready for real money?</h2><div class="card"><div class="row"><span class="mid">${R.met} of 5 met</span><span class="soft">from ${esc(R.start)}</span></div>
+  ${R.checks.map(c=>`<div class="check ${c.ok?"ok":c.failed?"bad":""}"><span class="tick">${c.ok?"✓":c.failed?"✗":"○"}</span><div><b>${esc(c.name)}</b>
+  <div class="soft">${esc(c.now)}</div><div class="soft need">Needs: ${esc(c.need)}</div></div></div>`).join("")}
+  <div class="soft" style="margin-top:8px">All 5 green → start with part of the $1,000 (say $300–500) for a month, then the rest.</div></div>`;}
+  h+=`<h2>Kronos AI - $1,000 paper test</h2>`;
+  if(!k)h+=`<div class="card empty">No forecasts yet.</div>`;
+  else{h+=`<div class="card"><div class="row"><span class="big">${usd(k.balance)}</span><span class="${cls(k.balance-k.start)}">${pct(k.balance/k.start-1)}</span></div>
+  <div class="soft">${k.scored} scored${k.hit!=null?` · right ${(k.hit*100).toFixed(1)}% · coin flip 50% · repeating yesterday ${(k.base_hit*100).toFixed(1)}%`:""}</div>
+  ${spark(k.equity,"var(--kron)")}<div class="soft">Verdict after 60 forecasts per market, about mid-January.</div></div>`;
+  if((k.open||[]).length)h+=`<div class="card"><b>Waiting for today to finish</b><table><tr><th>Market</th><th>Call</th><th class="n">Last</th><th class="n">Forecast</th></tr>${k.open.map(r=>`<tr><td>${esc(r.market)}</td><td><span class="pill ${r.signal>0?"up":r.signal<0?"down":"no"}">${r.signal>0?"up":r.signal<0?"down":"flat"}</span></td><td class="n">${Number(r.last_close).toPrecision(6)}</td><td class="n">${Number(r.pred_close).toPrecision(6)}</td></tr>`).join("")}</table></div>`;
+  if((k.recent||[]).length)h+=`<div class="card"><b>Latest scored</b><table><tr><th>Day</th><th>Market</th><th>Call</th><th class="n">After costs</th></tr>${k.recent.slice(0,24).map(r=>`<tr><td>${esc(String(r.next_date).slice(5))}</td><td>${esc(r.market)}</td><td>${r.hit==1?"✓ right":r.hit==0?"✗ wrong":"–"}</td><td class="n ${cls(r.net)}">${pct(r.net)}</td></tr>`).join("")}</table></div>`;}
+  const c=D.crypto;h+=`<h2>Crypto trend rule - R5,000 paper test</h2><div class="card">`;
+  if(c.rows&&c.rows.length){const last=c.rows[c.rows.length-1];
+    h+=`<div class="row"><span class="big">R${Math.round(last.rule_value_R).toLocaleString("en-ZA")}</span><span class="soft">holding: R${Math.round(last.hold_value_R).toLocaleString("en-ZA")}</span></div>
+    ${spark(c.rows.map(r=>[r.date,r.rule_value_R]),"var(--long)")}<div class="soft">BTC ${Math.round(last.BTC_in_coin*100)}% in coin, ETH ${Math.round(last.ETH_in_coin*100)}% · 90-day review mid-January</div>`;}
+  else h+=`<div class="empty">${esc(c.line||"No results yet.")}</div>`;
+  h+=`</div><h2>Gold</h2><div class="card"><div class="soft">${esc(D.gold.line||"No entries yet.")}</div></div>
+  <h2>System health</h2><div class="card soft">MT5 check: ${esc(D.mt5_check||"–")}<br>Data sent: ${esc(D.updated)}${stale()?'<br><b style="color:var(--amber)">No update for over an hour - is the PC on and MT5 open?</b>':""}</div>
+  <p class="note">Demo account and paper money only. Research tooling, not financial advice.</p>`;
+  $("#tests").innerHTML=h;
+}
+function go(tab,pair){
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===tab));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  if(pair){const el=document.getElementById("sig-"+pair);if(el){el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"});}}
+  else window.scrollTo(0,0);
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+document.querySelectorAll(".tile").forEach(t=>t.addEventListener("keydown",e=>{if(e.key==="Enter")t.click()}));
+load();setInterval(load,5*60*1000);
+</script>
+</body></html>
