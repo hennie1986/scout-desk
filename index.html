@@ -179,7 +179,7 @@ function today(){
   let h=`<h2>Demo account today</h2><div class="card"><div class="big ${cls(banked+floating)}">${sgn(banked+floating)}</div>
   <div class="soft">${sgn(banked)} banked from ${closedToday.length} closed trade${closedToday.length===1?"":"s"}, ${sgn(floating)} on ${m.open.length} open</div>
   ${m.balance!=null?`<div class="soft">Balance ${usd(m.balance)} · equity ${usd(m.equity)}</div>`:""}
-  ${m.error?`<div class="soft">MT5 wasn't reachable at the last update - trades shown may be out of date.</div>`:""}</div>`;
+  ${m.error?`<div class="soft" style="color:var(--amber)">MT5 wasn't reachable at the last update${m.as_of?` - showing the account as it was at ${esc(m.as_of.slice(11))}`:""}. Check MT5 is open and logged in.</div>`:""}</div>`;
   h+=`<h2>Open trades</h2>`+((m.open||[]).length?m.open.map(tradeCard).join(""):`<div class="card empty">No open trades.</div>`);
   const ev=((run.calendar||{}).events||[]).filter(e=>e.impact==="High").slice(0,4);
   h+=`<h2>Next big events</h2><div class="card">${ev.length?ev.map(e=>`<div class="cal"><span>${esc(e.sa_time)}</span><b>${esc(e.country)}</b><span>${esc(e.title)}</span></div>`).join(""):`<div class="empty">No high-impact events in the next 36 hours.</div>`}</div>`;
